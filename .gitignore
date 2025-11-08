@@ -17,6 +17,7 @@ target/
 *.swp
 *.swo
 *.sublime-*
+.metals/
 
 # OS
 .DS_Store
