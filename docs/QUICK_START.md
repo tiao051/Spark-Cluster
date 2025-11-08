@@ -27,6 +27,8 @@ Then in the REPL:
 
 ```scala
 :load /workspace/scripts/scala/rdd_operations.scala
+:load /workspace/scripts/scala/word_count.scala
+:load /workspace/scripts/scala/read_json.scala
 ```
 
 ## 4. Stop the Cluster
