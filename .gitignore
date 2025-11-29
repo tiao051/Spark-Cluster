@@ -10,6 +10,8 @@ build/
 target/
 *.class
 *.jar
+.scala-build
+.metals
 
 # IDEs
 .idea/
@@ -26,8 +28,9 @@ Thumbs.db
 logs/
 *.log
 
-# Data (optional - uncomment if you want to exclude)
+# Data
 # data/
+/dataset
 
 # Docker
 .docker-compose.override.yml
