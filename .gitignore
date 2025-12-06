@@ -16,21 +16,13 @@ target/
 # IDEs
 .idea/
 .vscode/
-*.swp
-*.swo
-*.sublime-*
-
-# OS
-.DS_Store
-Thumbs.db
 
 # Logs
 logs/
 *.log
 
 # Data
-# data/
-/dataset
+dataset
 
 # Docker
 .docker-compose.override.yml
@@ -38,3 +30,4 @@ logs/
 # Environment
 .env.local
 .env.*.local
+hadoop.env
