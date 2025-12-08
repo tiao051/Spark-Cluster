@@ -1,5 +1,5 @@
 """
-Lab 2: Character Interaction Analysis
+Character Interaction Analysis
 
 Analyzes character co-occurrence patterns in the Harry Potter text.
 Identifies pairs of characters that appear together in sentences
@@ -13,7 +13,7 @@ Output:
 """
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, split, explode, lower, udf
+from pyspark.sql.functions import col, split, explode, lower, udf, desc
 from pyspark.sql.types import ArrayType, StringType
 import itertools
 
@@ -21,7 +21,7 @@ import itertools
 CHARACTER_LIST = ["harry", "ron", "hermione", "malfoy", "snape", "dumbledore"]
 
 
-def extract_character_pairs(text: str) -> list[str]:
+def extract_character_pairs(text: str) -> list:
     """
     Extract character pairs that co-occur in the same sentence.
     
@@ -48,27 +48,25 @@ def main():
     spark.sparkContext.setLogLevel("WARN")
     
     try:
-        # Load text data
         print("[INFO] Reading data from HDFS...")
         raw_data = spark.read.text("hdfs://namenode:9000/input/harrypotter.txt")
         
-        # Sentence tokenization: split on sentence boundaries
+        print("[INFO] Tokenizing sentences...")
         sentences = raw_data.select(
             explode(split(col("value"), "[.?!]")).alias("text")
         ).filter(col("text") != "").withColumn("text", lower(col("text")))
         
-        # Register UDF for pair extraction
         pair_udf = udf(extract_character_pairs, ArrayType(StringType()))
         
-        # Extract and count character pairs
+        print("[INFO] Extracting and counting character pairs...")
         df_pairs = sentences.withColumn("pairs", pair_udf(col("text")))
         result = df_pairs.select(explode(col("pairs")).alias("pair")) \
                          .groupBy("pair").count() \
-                         .orderBy(col("count").desc())
+                         .orderBy(desc("count"))
         
-        print("\n" + "="*50)
+        print("\n" + "="*60)
         print("CHARACTER INTERACTION PAIRS")
-        print("="*50)
+        print("="*60)
         result.show(20, truncate=False)
         
     except Exception as e:
