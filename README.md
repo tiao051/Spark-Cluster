@@ -20,6 +20,8 @@ This setup includes:
 - **Spark Worker** (3.3.0)
 - **Hadoop Namenode** (3.2.1)
 - **Hadoop Datanode** (3.2.1)
+- **Hadoop ResourceManager** (3.2.1)
+- **Hadoop NodeManager** (3.2.1)
 
 All services communicate through a bridge network and share mounted volumes for code execution.
 
@@ -79,14 +81,14 @@ Create a Python script in `scripts/python/`:
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder \
-    .master("spark://spark-master:7077") \
     .appName("MyApp") \
     .getOrCreate()
 
-spark.sparkContext.setLogLevel("ERROR")
+spark.sparkContext.setLogLevel("WARN")
 
-rdd = spark.sparkContext.parallelize([1, 2, 3, 4, 5])
-print(f"Result: {rdd.collect()}")
+# Read from HDFS
+df = spark.read.text("hdfs://namenode:9000/input/file.txt")
+df.show()
 ```
 
 Submit it to the cluster:
@@ -94,10 +96,7 @@ Submit it to the cluster:
 ```powershell
 docker exec spark-master /spark/bin/spark-submit `
   --master spark://spark-master:7077 `
-  --driver-java-options "-Dlog4j.configuration=file:/workspace/config/log4j.properties" `
-  --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/workspace/config/log4j.properties" `
-  --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/workspace/config/log4j.properties" `
-  /workspace/scripts/python/your_script.py
+  /scripts/python/your_script.py
 ```
 
 ### Option C: Load Scala Scripts in REPL
@@ -110,14 +109,16 @@ scala> :load /workspace/scripts/scala/script.scala
 
 ## File Organization
 
-All files in the project directory are automatically mounted to `/workspace` inside the containers:
+All files in the project directory are automatically mounted inside the containers:
 
-- `scripts/python/` - Python scripts for batch processing
-- `scripts/scala/` - Scala scripts for interactive analysis
-- `data/` - Data files accessible to jobs
-- `config/` - Configuration files (log4j.properties, .env)
+- `scripts/python/` → `/scripts/python/` - Python scripts for batch processing
+- `scripts/scala/` → `/scripts/scala/` - Scala scripts for interactive analysis
+- `dataset/` → `/dataset/` - Data files accessible to jobs
+- `../week2/` → `/week2/` - Week 2 project files
+- `../week3/` → `/week3/` - Week 3 project files
+- `config/` - Configuration files (log4j.properties, hadoop.env)
 
-See [Project Structure](docs/PROJECT_STRUCTURE.md) for complete directory layout.
+HDFS data path: `hdfs://namenode:9000/input/`
 
 ## Stopping the Cluster
 
@@ -135,5 +136,5 @@ docker-compose down -v
 
 ## Network
 
-All services communicate through the `bigdata_network` bridge network. Services can reach each other using their container names (e.g., `spark-master:7077`).
+All services communicate through the `bigdata-network` bridge network. Services can reach each other using their container names (e.g., `spark-master:7077`, `namenode:9000`).
 
