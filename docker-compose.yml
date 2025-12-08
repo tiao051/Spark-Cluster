@@ -53,3 +53,41 @@ services:
       - namenode
       - datanode
       - resourcemanager
+
+  spark-master:
+    image: bde2020/spark-master:3.3.0-hadoop3.3
+    container_name: spark-master
+    restart: always
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./dataset:/dataset
+      - ../week2:/week2
+      - ../week3:/week3
+      - ./scripts:/scripts
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+    depends_on:
+      - namenode
+
+  spark-worker:
+    image: bde2020/spark-worker:3.3.0-hadoop3.3
+    container_name: spark-worker
+    restart: always
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./dataset:/dataset
+      - ../week2:/week2
+      - ../week3:/week3
+      - ./scripts:/scripts
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+    depends_on:
+      - spark-master
+
+networks:
+  default:
+    name: bigdata-network
+    driver: bridge
