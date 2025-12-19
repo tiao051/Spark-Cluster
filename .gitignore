@@ -28,6 +28,7 @@ dataset
 .docker-compose.override.yml
 
 # Environment
+config
 .env.local
 .env.*.local
 hadoop.env

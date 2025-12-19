@@ -16,24 +16,28 @@ For detailed project structure, see [Project Structure](docs/PROJECT_STRUCTURE.m
 ## Architecture
 
 This setup includes:
-- **Spark Master** (3.3.0)
-- **Spark Worker** (3.3.0)
+- **Spark Master** (3.3.0) - Built with custom Dockerfile
+- **Spark Worker** (3.3.0) - Built with custom Dockerfile
 - **Hadoop Namenode** (3.2.1)
 - **Hadoop Datanode** (3.2.1)
 - **Hadoop ResourceManager** (3.2.1)
 - **Hadoop NodeManager** (3.2.1)
 
+Pre-installed Python packages in Spark containers: numpy, pandas, matplotlib, textblob
+
 All services communicate through a bridge network and share mounted volumes for code execution.
 
 ## Getting Started
 
-### 1. Start the Cluster
+### 1. Build and Start the Cluster
 
-Navigate to the project directory and start all services:
+Navigate to the project directory and build/start all services:
 
 ```powershell
-docker-compose up -d
+docker compose up -d --build
 ```
+
+This will build custom Spark images with pre-installed dependencies (numpy, pandas, matplotlib, textblob).
 
 Verify all containers are running:
 
@@ -125,13 +129,19 @@ HDFS data path: `hdfs://namenode:9000/input/`
 To stop all services:
 
 ```powershell
-docker-compose down
+docker compose down
 ```
 
 To stop and remove all data:
 
 ```powershell
-docker-compose down -v
+docker compose down -v
+```
+
+To rebuild images (after changes to Dockerfile):
+
+```powershell
+docker compose up -d --build
 ```
 
 ## Network
