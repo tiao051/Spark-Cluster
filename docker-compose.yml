@@ -55,7 +55,9 @@ services:
       - resourcemanager
 
   spark-master:
-    image: bde2020/spark-master:3.3.0-hadoop3.3
+    build:
+      context: .
+      dockerfile: Dockerfile.master
     container_name: spark-master
     restart: always
     ports:
@@ -72,7 +74,9 @@ services:
       - namenode
 
   spark-worker:
-    image: bde2020/spark-worker:3.3.0-hadoop3.3
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
     container_name: spark-worker
     restart: always
     ports:
